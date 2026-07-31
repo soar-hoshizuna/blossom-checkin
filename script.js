@@ -32,10 +32,10 @@ const CONFIG = {
   BLENDS: [
     { key: "berry",    name: "BERRY" },
     { key: "marie",    name: "MARIE" },
-    { key: "mimosa",   name: "MIMOSA" },
+    { key: "mimosa",   name: "MIMOZA" },
     { key: "leaf",     name: "LEAF" },
-    { key: "mallow",   name: "MALLOW" },
-    { key: "violet",   name: "VIOLET" },
+    { key: "mallow",   name: "MAROU" },
+    { key: "violet",   name: "SUMIRE" },
     { key: "mokara",   name: "MOKARA" },
     { key: "onaka",    name: "ONAKA" },
     { key: "kokyuu",   name: "KOKYUU" },
@@ -80,7 +80,7 @@ const QUESTIONS = [
     type: "multi",
     axis: "range",
     options: [
-      "BERRY", "MARIE", "MIMOSA", "LEAF", "MALLOW", "VIOLET", "MOKARA",
+      "BERRY", "MARIE", "MIMOZA", "LEAF", "MAROU", "SUMIRE", "MOKARA",
       "ONAKA", "KOKYUU", "PAIN", "ACTIVITY", "WOMAN", "SKIN",
       "まだ把握できていない",
     ],
@@ -513,7 +513,7 @@ function computeAxisLevels(answers) {
   ブレンド数だけで決めず、活用・発信・提案・購入・継続を総合して判定します。
   （※ Wix購入履歴との照合による正式な判定
      ・STAGE2：有効ブレンド数7種類以上 ＋ 活動条件達成
-     ・STAGE3：チャクラブレンド7種（BERRY/MARIE/MIMOSA/LEAF/MALLOW/VIOLET/MOKARA）保有 ＋ 活動条件達成
+     ・STAGE3：チャクラブレンド7種（BERRY/MARIE/MIMOZA/LEAF/MAROU/SUMIRE/MOKARA）保有 ＋ 活動条件達成
      は、運営者が管理シート上で確定させる運用としています。README参照）
 */
 function determineStage(levels) {
