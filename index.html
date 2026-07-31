@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLOSSOM 現在地診断 | 認定サロン専用</title>
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;600&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="bg-decoration" aria-hidden="true">
+  <svg class="leaf leaf-1" viewBox="0 0 100 100"><path d="M50 10 C70 30 70 70 50 90 C30 70 30 30 50 10 Z"/></svg>
+  <svg class="leaf leaf-2" viewBox="0 0 100 100"><path d="M50 10 C70 30 70 70 50 90 C30 70 30 30 50 10 Z"/></svg>
+</div>
+
+<div class="app-shell">
+
+  <!-- ヘッダー -->
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-mark">BLOSSOM</span>
+      <span class="brand-sub">Bloom in Warmth</span>
+    </div>
+  </header>
+
+  <!-- 進行状況バー（質問画面のみ表示） -->
+  <div class="progress-wrap" id="progressWrap" hidden>
+    <div class="progress-label">
+      <span id="progressText">質問 1 / 11</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <main class="app-main" id="appMain">
+
+    <!-- ========== 画面0：イントロ ========== -->
+    <section class="screen" id="screen-intro" data-screen>
+      <div class="card intro-card">
+        <p class="eyebrow">認定サロン専用 現在地診断</p>
+        <h1 class="intro-title">あなたのサロンの、<br>BLOSSOMの「今」を見つめる時間</h1>
+        <p class="intro-lead">
+          これはテストではありません。<br>
+          今のあなたの活動を認め、次の一歩をやさしく整理するための診断です。<br>
+          所要時間は3〜5分ほどです。
+        </p>
+
+        <div class="field-group">
+          <label for="inputName">お名前</label>
+          <input type="text" id="inputName" placeholder="例）山田 花子" autocomplete="name">
+          <p class="field-error" id="errName" hidden>お名前を入力してください</p>
+        </div>
+
+        <div class="field-group">
+          <label for="inputEmail">メールアドレス</label>
+          <input type="email" id="inputEmail" placeholder="例）salon@example.com" autocomplete="email">
+          <p class="field-error" id="errEmail" hidden>正しいメールアドレスを入力してください</p>
+        </div>
+
+        <button class="btn btn-primary btn-block" id="btnStart">診断をはじめる</button>
+        <p class="privacy-note">入力いただいた情報は、診断結果のご案内以外には使用しません。</p>
+      </div>
+    </section>
+
+    <!-- ========== 質問画面（JSで動的生成） ========== -->
+    <section class="screen" id="screen-question" data-screen hidden>
+      <div class="card question-card">
+        <h2 class="question-title" id="qTitle"></h2>
+        <p class="question-sub" id="qSub"></p>
+        <div class="options" id="qOptions"></div>
+
+        <div class="nav-row">
+          <button class="btn btn-ghost" id="btnBack">← 前の質問へ</button>
+          <button class="btn btn-primary" id="btnNext">次へ →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 送信中ローディング ========== -->
+    <section class="screen" id="screen-loading" data-screen hidden>
+      <div class="card loading-card">
+        <div class="loader" aria-hidden="true">
+          <svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="26"/></svg>
+        </div>
+        <p>あなたの現在地を、ゆっくり読み解いています…</p>
+      </div>
+    </section>
+
+    <!-- ========== 結果画面 ========== -->
+    <section class="screen" id="screen-result" data-screen hidden>
+      <div class="card result-card">
+
+        <div class="growth-indicator" id="growthIndicator" aria-hidden="true">
+          <!-- JSで種→芽→葉→つぼみ→開花 のアイコンを描画 -->
+        </div>
+
+        <p class="eyebrow" id="resultStageLabel">STAGE 1｜基礎を整える</p>
+        <h2 class="result-heading" id="resultHeading">あなたの現在地</h2>
+
+        <div class="result-block" id="resultIntro"></div>
+
+        <div class="result-block">
+          <h3 class="result-sub-heading">すでにできていること</h3>
+          <ul class="result-list" id="resultCan"></ul>
+        </div>
+
+        <div class="result-block">
+          <h3 class="result-sub-heading">BLOSSOMをどう育てていけそうか</h3>
+          <div id="resultGrow"></div>
+        </div>
+
+        <div class="result-block">
+          <h3 class="result-sub-heading">今月のおすすめアクション</h3>
+          <ol class="result-actions" id="resultActions"></ol>
+        </div>
+
+        <div class="result-block product-note" id="resultProductNote" hidden></div>
+
+        <div class="save-status" id="saveStatus"></div>
+
+        <div class="result-buttons">
+          <button class="btn btn-primary btn-block" id="btnSaveAgain" hidden>結果をもう一度保存する</button>
+          <button class="btn btn-ghost btn-block" id="btnRestart">もう一度診断する</button>
+          <a class="btn btn-outline btn-block" id="btnBackToMember" href="#">BLOSSOM会員ページへ戻る</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <p>BLOSSOM ｜ soar therapist academy</p>
+  </footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
