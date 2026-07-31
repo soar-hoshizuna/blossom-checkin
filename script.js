@@ -22,8 +22,11 @@ const CONFIG = {
   // 詳しい手順は README.md に記載しています。
   GAS_ENDPOINT_URL: "https://script.google.com/macros/s/AKfycbyMSOySvasI4EykGZK3Vpn9PlzOfr86x-9v_81lBv9fdF9nnMOrnRV-nGF0pBNbJMqg/exec",
 
-  // 会員ページへ戻るボタンのリンク先（Wixの会員ページURLに変更してください）
+  // 会員ページへ戻るボタンのリンク先
   MEMBER_PAGE_URL: "https://www.soar-wellness.com/s-projects-basic-2",
+
+  // 「ブレンドを注文する」ボタンのリンク先
+  ORDER_PAGE_URL: "https://www.soar-wellness.com/onlineorder-blossomsteam",
 
   // 13ブレンドの一覧（管理・記録用。将来Wix連携をする際にも使用します）
   BLENDS: [
@@ -72,7 +75,8 @@ const QUESTIONS = [
   },
   {
     id: "q2",
-    title: "現在、何種類のBLOSSOMブレンドを取り扱っていますか。",
+    title: "直近1年以内に購入したBLOSSOMブレンドは、何種類くらいありますか。",
+    sub: "1年以上前に購入したきりで、その後仕入れていないものは含めずにお答えください。",
     type: "single",
     axis: "range",
     options: ["1〜3種類", "4〜7種類", "8〜12種類", "13種類", "まだ把握できていない"],
@@ -274,8 +278,7 @@ const el = {
   resultGrow: document.getElementById("resultGrow"),
   resultActions: document.getElementById("resultActions"),
   resultProductNote: document.getElementById("resultProductNote"),
-  saveStatus: document.getElementById("saveStatus"),
-  btnSaveAgain: document.getElementById("btnSaveAgain"),
+  btnOrder: document.getElementById("btnOrder"),
   btnRestart: document.getElementById("btnRestart"),
   btnBackToMember: document.getElementById("btnBackToMember"),
 };
@@ -697,7 +700,13 @@ function buildProductNote(answers, levels) {
   // 取扱ブレンドがまだ少ない人にも、選択肢を広げる入り口として案内する
   const rangeIsNarrow = levels.range <= 1;
 
-  if (wantsMoreProposal || wantsWiderRange || strugglesToPropose || rangeIsNarrow) {
+  if (rangeIsNarrow) {
+    // 取扱ブレンドが少ないこと自体が主な理由の場合は、
+    // 「なぜ選択肢を広げることが大切か」という背景まで伝える、少し踏み込んだ案内にする
+    return "取り扱うブレンドの幅が少ないと、発信や口コミでせっかくご来店いただいても、その日のお客様の状態にぴったり合う一本が見つからず、体験の満足度が十分に伝わりきらないことがあります。これは気づきにくいことですが、次のご来店やご紹介にも関わってくる大切なポイントです。200gサイズなら、少量から新しいブレンドを取り入れて、施術・発信・提案の中で実際に試しながら、ご自身のサロンに合う取扱いを無理なく育てていくことができます。";
+  }
+
+  if (wantsMoreProposal || wantsWiderRange || strugglesToPropose) {
     return "新しいブレンドを取り入れてみたい場合は、200gから少量で試すこともできます。まずは一つ選び、施術・発信・提案の中で動かしながら、ご自身のサロンに合う取扱いを育てていきましょう。";
   }
   return null;
@@ -762,6 +771,7 @@ function renderResult(result) {
     el.resultProductNote.hidden = true;
   }
 
+  el.btnOrder.href = CONFIG.ORDER_PAGE_URL;
   el.btnBackToMember.href = CONFIG.MEMBER_PAGE_URL;
 
   showScreen("result");
@@ -813,15 +823,11 @@ async function submitDiagnosis() {
 
   try {
     await postToSheet(payload);
-    el.saveStatus.textContent = "回答を保存しました。";
-    el.saveStatus.classList.remove("error");
-    el.btnSaveAgain.hidden = true;
     state.submitted = true;
   } catch (err) {
-    // 専門的なエラー内容は画面に出さない
-    el.saveStatus.textContent = "回答を保存できませんでした。時間を置いてもう一度お試しください。";
-    el.saveStatus.classList.add("error");
-    el.btnSaveAgain.hidden = false;
+    // 送信に失敗しても、本人には何も表示しない（診断結果自体は必ず見せる）
+    // デバッグ用にコンソールへだけ記録しておく
+    console.error("BLOSSOM診断：送信に失敗しました", err);
   }
 
   state.submitting = false;
@@ -841,30 +847,6 @@ function postToSheet(payload) {
     return res.json().catch(() => ({}));
   });
 }
-
-el.btnSaveAgain.addEventListener("click", async () => {
-  if (!state.resultPayload) return;
-  el.saveStatus.textContent = "保存中です…";
-  el.saveStatus.classList.remove("error");
-  const payload = {
-    timestamp: new Date().toISOString(),
-    name: state.name,
-    email: state.email,
-    answers: state.answers,
-    stage: state.resultPayload.stageLabel,
-    canList: state.resultPayload.canList,
-    actions: state.resultPayload.actions,
-    fullResultText: buildFullResultText(state.resultPayload),
-  };
-  try {
-    await postToSheet(payload);
-    el.saveStatus.textContent = "回答を保存しました。";
-    el.btnSaveAgain.hidden = true;
-  } catch (e) {
-    el.saveStatus.textContent = "回答を保存できませんでした。時間を置いてもう一度お試しください。";
-    el.saveStatus.classList.add("error");
-  }
-});
 
 el.btnRestart.addEventListener("click", () => {
   state.currentIndex = -1;
