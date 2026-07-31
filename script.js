@@ -75,11 +75,15 @@ const QUESTIONS = [
   },
   {
     id: "q2",
-    title: "直近1年以内に購入したBLOSSOMブレンドは、何種類くらいありますか。",
-    sub: "1年以上前に購入したきりで、その後仕入れていないものは含めずにお答えください。",
-    type: "single",
+    title: "直近1年以内に購入したBLOSSOMブレンドを、当てはまるものすべて選んでください。",
+    sub: "1年以上前に購入したきりで、その後仕入れていないものは含めないでください。複数選択できます。",
+    type: "multi",
     axis: "range",
-    options: ["1〜3種類", "4〜7種類", "8〜12種類", "13種類", "まだ把握できていない"],
+    options: [
+      "ベリー", "マリー", "ミモザ", "リーフ", "マロウ", "スミレ", "モカラ",
+      "ONAKA", "KOKYUU", "PAIN", "ACTIVITY", "WOMAN", "SKIN",
+      "まだ把握できていない",
+    ],
   },
   {
     id: "q3",
@@ -438,8 +442,16 @@ function computeAxisLevels(answers) {
     ? 0 : Math.min(3, Math.ceil(destination.length / 2));
 
   // 取扱ブレンドの広がり
-  const rangeMap = { "1〜3種類": 1, "4〜7種類": 2, "8〜12種類": 3, "13種類": 3, "まだ把握できていない": 0 };
-  levels.range = rangeMap[answers.q2] ?? 0;
+  const purchasedBlends = (answers.q2 || []).filter(v => v !== "まだ把握できていない");
+  const purchasedCount = purchasedBlends.length;
+  levels.range = purchasedCount === 0 ? 0 : purchasedCount <= 3 ? 1 : purchasedCount <= 6 ? 2 : 3;
+
+  // STAGE3の解放条件と同じ「チャクラブレンド7種」をすべて保有しているか（内部の目安表示にのみ使用）
+  const ownsChakraBlends = CONFIG.CHAKRA_BLEND_KEYS.every((key) => {
+    const blend = CONFIG.BLENDS.find((b) => b.key === key);
+    return blend && purchasedBlends.includes(blend.name);
+  });
+  levels.ownsChakraBlends = ownsChakraBlends;
 
   // 実際の活用状況（実活用ブレンド数 ＋ 活用シーンの多さ）
   const activationCountMap = { "1種類": 1, "2〜3種類": 2, "4〜6種類": 3, "7種類以上": 3, "まだ決まった使い方がない": 0 };
@@ -512,7 +524,7 @@ function determineStage(levels) {
   let stage = 1;
   let proximity = 0; // 0〜1：次のステージまでの距離感（成長アイコンの段階に使用）
 
-  if (total >= 2.3 && levels.sns >= 2 && levels.purchase >= 2 && levels.retention >= 2) {
+  if (total >= 2.3 && levels.sns >= 2 && levels.purchase >= 2 && levels.retention >= 2 && levels.ownsChakraBlends) {
     stage = 3;
     proximity = 1;
   } else if (total >= 1.4) {
@@ -812,7 +824,7 @@ async function submitDiagnosis() {
     name: state.name,
     email: state.email,
     answers: state.answers,
-    rangeAnswer: state.answers.q2 || "",
+    rangeAnswer: Array.isArray(state.answers.q2) ? state.answers.q2.join(" / ") : (state.answers.q2 || ""),
     activationAnswer: state.answers.q3 || "",
     destinationAnswers: state.answers.q1 || [],
     stage: result.stageLabel,
