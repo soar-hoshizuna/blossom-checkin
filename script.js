@@ -30,13 +30,13 @@ const CONFIG = {
 
   // 13ブレンドの一覧（管理・記録用。将来Wix連携をする際にも使用します）
   BLENDS: [
-    { key: "berry",    name: "ベリー" },
-    { key: "marie",    name: "マリー" },
-    { key: "mimosa",   name: "ミモザ" },
-    { key: "leaf",     name: "リーフ" },
-    { key: "mallow",   name: "マロウ" },
-    { key: "violet",   name: "スミレ" },
-    { key: "mokara",   name: "モカラ" },
+    { key: "berry",    name: "BERRY" },
+    { key: "marie",    name: "MARIE" },
+    { key: "mimosa",   name: "MIMOSA" },
+    { key: "leaf",     name: "LEAF" },
+    { key: "mallow",   name: "MALLOW" },
+    { key: "violet",   name: "VIOLET" },
+    { key: "mokara",   name: "MOKARA" },
     { key: "onaka",    name: "ONAKA" },
     { key: "kokyuu",   name: "KOKYUU" },
     { key: "pain",     name: "PAIN" },
@@ -76,11 +76,11 @@ const QUESTIONS = [
   {
     id: "q2",
     title: "直近1年以内に購入したBLOSSOMブレンドを、当てはまるものすべて選んでください。",
-    sub: "1年以上前に購入したきりで、その後仕入れていないものは含めないでください。複数選択できます。",
+    sub: "500g・200gのSTEAM用ブレンドが対象です（TEAは含みません）。1年以上前に購入したきりで、その後仕入れていないものは含めないでください。複数選択できます。",
     type: "multi",
     axis: "range",
     options: [
-      "ベリー", "マリー", "ミモザ", "リーフ", "マロウ", "スミレ", "モカラ",
+      "BERRY", "MARIE", "MIMOSA", "LEAF", "MALLOW", "VIOLET", "MOKARA",
       "ONAKA", "KOKYUU", "PAIN", "ACTIVITY", "WOMAN", "SKIN",
       "まだ把握できていない",
     ],
@@ -513,7 +513,7 @@ function computeAxisLevels(answers) {
   ブレンド数だけで決めず、活用・発信・提案・購入・継続を総合して判定します。
   （※ Wix購入履歴との照合による正式な判定
      ・STAGE2：有効ブレンド数7種類以上 ＋ 活動条件達成
-     ・STAGE3：チャクラブレンド7種（ベリー/マリー/ミモザ/リーフ/マロウ/スミレ/モカラ）保有 ＋ 活動条件達成
+     ・STAGE3：チャクラブレンド7種（BERRY/MARIE/MIMOSA/LEAF/MALLOW/VIOLET/MOKARA）保有 ＋ 活動条件達成
      は、運営者が管理シート上で確定させる運用としています。README参照）
 */
 function determineStage(levels) {
